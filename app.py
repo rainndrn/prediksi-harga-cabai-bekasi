@@ -29,7 +29,7 @@ sarima_model, xgb_model = load_models()
 # =====================
 @st.cache_data
 def load_data():
-    df = pd.read_csv("data/cabai_bekasi.csv")
+    df = pd.read_csv("data/cabai-merah-besar.csv")
     df['tanggal'] = pd.to_datetime(df['tanggal'])
     return df
 
