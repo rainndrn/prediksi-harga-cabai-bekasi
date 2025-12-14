@@ -28,16 +28,26 @@ sarima_model, xgb_model = load_models()
 # Load Dataset
 # =====================
 import os
-st.write(os.listdir("."))
-st.write(os.listdir("data"))
 
 @st.cache_data
 def load_data():
-    import os
     base_dir = os.path.dirname(__file__)
-    data_path = os.path.join(base_dir, "data", "cabai-merah-besar.csv")
+    data_path = os.path.join(base_dir, "data", "cabai_bekasi.csv")
     df = pd.read_csv(data_path)
-    df["tanggal"] = pd.to_datetime(df["tanggal"])
+
+    # rapikan nama kolom
+    df.columns = df.columns.str.lower().str.strip()
+
+    # parsing tanggal format: DD MM YYYY
+    df["tanggal"] = pd.to_datetime(
+        df["tanggal"],
+        format="%d %m %Y",
+        errors="coerce"
+    )
+
+    # hapus baris tanggal invalid (jaga-jaga)
+    df = df.dropna(subset=["tanggal"])
+
     return df
 
 df = load_data()
