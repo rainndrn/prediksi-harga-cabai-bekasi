@@ -105,10 +105,24 @@ if st.button("🔮 Prediksi"):
             forecast = sarima_model.forecast(steps=steps)
             pred_df = pd.DataFrame({"Prediksi": forecast})
         else:
-            # Contoh sederhana fitur lag
-            last_values = df['harga'].values[-steps:]
-            X_pred = np.array(last_values).reshape(steps, 1)
-            forecast = xgb_model.predict(X_pred)
+            # ===== XGBoost (FIX feature mismatch) =====
+            n_feat = getattr(xgb_model, "n_features_in_", 3)
+        
+            history = df["harga"].dropna().values.tolist()
+        
+            if len(history) < n_feat:
+                st.error(f"Data tidak cukup untuk XGBoost. Butuh minimal {n_feat} data terakhir.")
+                st.stop()
+        
+            preds = []
+            for _ in range(steps):
+                # fitur = lag1, lag2, ..., lag_n
+                X_input = np.array(history[-n_feat:][::-1], dtype=float).reshape(1, n_feat)
+                y_hat = float(xgb_model.predict(X_input)[0])
+                preds.append(y_hat)
+                history.append(y_hat)
+        
+            forecast = np.array(preds)
             pred_df = pd.DataFrame({"Prediksi": forecast})
         
         st.subheader("📈 Hasil Prediksi")
