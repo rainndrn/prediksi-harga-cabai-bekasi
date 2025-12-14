@@ -28,9 +28,16 @@ sarima_model, xgb_model = load_models()
 # Load Dataset
 # =====================
 @st.cache_data
+import os
+st.write(os.listdir("."))
+st.write(os.listdir("data"))
+
 def load_data():
-    df = pd.read_csv("data/cabai-merah-besar.csv")
-    df['tanggal'] = pd.to_datetime(df['tanggal'])
+    import os
+    base_dir = os.path.dirname(__file__)
+    data_path = os.path.join(base_dir, "data", "cabai-merah-besar.csv")
+    df = pd.read_csv(data_path)
+    df["tanggal"] = pd.to_datetime(df["tanggal"])
     return df
 
 df = load_data()
