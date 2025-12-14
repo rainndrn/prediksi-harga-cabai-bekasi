@@ -32,7 +32,7 @@ import os
 @st.cache_data
 def load_data():
     base_dir = os.path.dirname(__file__)
-    data_path = os.path.join(base_dir, "data", "cabai_bekasi.csv")
+    data_path = os.path.join(base_dir, "data", "cabai-merah-besar.csv")
     df = pd.read_csv(data_path)
 
     # rapikan nama kolom
