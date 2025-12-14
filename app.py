@@ -32,33 +32,45 @@ sarima_model, xgb_model = load_models()
 # =====================
 # Load Dataset
 # =====================
-@st.cache_data
+@st.cache_data(show_spinner="Memuat dataset...")
 def load_data():
-    # Coba beberapa kemungkinan path
-    possible_paths = [
-        "data/cabai_bekasi.csv",
-        "cabai_bekasi.csv",
-        os.path.join("data", "cabai-merah-besar.csv"),
-    ]
-    
-    for data_path in possible_paths:
-        if os.path.exists(data_path):
-            df = pd.read_csv(data_path)
-            
-            # rapikan nama kolom
-            df.columns = df.columns.str.lower().str.strip()
-            
-            # parsing tanggal format: DD MM YYYY
-            df["tanggal"] = pd.to_datetime(
-                df["tanggal"],
-                format="%d %m %Y",
-                errors="coerce"
-            )
-            
-            # hapus baris tanggal invalid (jaga-jaga)
-            df = df.dropna(subset=["tanggal"])
-            
-            return df
+    path = "data/cabai-merah-besar.csv"
+
+    if not os.path.exists(path):
+        st.error("File dataset tidak ditemukan!")
+        st.info(f"Pastikan file ada di: {path}")
+        st.info(f"Current directory: {os.getcwd()}")
+        st.stop()
+
+    # Dataset kamu pakai delimiter ;
+    df = pd.read_csv(path, sep=";", encoding="utf-8-sig")
+
+    # rapikan nama kolom
+    df.columns = (
+        df.columns.astype(str)
+        .str.replace("\ufeff", "", regex=False)
+        .str.lower()
+        .str.strip()
+    )
+
+    # validasi kolom wajib
+    if not {"tanggal", "harga"}.issubset(df.columns):
+        st.error("Kolom wajib 'tanggal' dan 'harga' tidak ditemukan!")
+        st.info(f"Kolom terbaca: {df.columns.tolist()}")
+        st.stop()
+
+    # parsing tanggal & harga
+    df["tanggal"] = pd.to_datetime(df["tanggal"], errors="coerce")
+    df["harga"] = pd.to_numeric(df["harga"], errors="coerce")
+
+    # buang data invalid
+    df = (
+        df.dropna(subset=["tanggal", "harga"])
+          .sort_values("tanggal")
+          .reset_index(drop=True)
+    )
+
+    return df
     
     # Jika tidak ada file yang ditemukan
     st.error("File 'cabai-merah-besar.csv' tidak ditemukan!")
