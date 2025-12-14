@@ -27,11 +27,11 @@ sarima_model, xgb_model = load_models()
 # =====================
 # Load Dataset
 # =====================
-@st.cache_data
 import os
 st.write(os.listdir("."))
 st.write(os.listdir("data"))
 
+@st.cache_data
 def load_data():
     import os
     base_dir = os.path.dirname(__file__)
