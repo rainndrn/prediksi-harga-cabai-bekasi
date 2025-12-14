@@ -112,7 +112,7 @@ streamlit run app.py
 
 ## 👨‍🎓 Penulis
 
-**Nama:** *(Isi nama peneliti)*
+**Nama:** *Raina Andriani Putri*
 **Judul Penelitian:**
 **Prediksi Harga Cabai Merah Besar di Kabupaten Bekasi Menggunakan Metode SARIMA dan XGBoost**
 
